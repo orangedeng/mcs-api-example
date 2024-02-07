@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcs-api-controller
+spec:
+  selector:
+    matchLabels:
+      app: mcs-api-controller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mcs-api-controller
+    spec:
+      containers:
+      - name: mcs-api-controller
+        imagePullPolicy: Always
+        image: orstar/mcs-api-controller:v0.1.0-20240201
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+        command:
+          - "/controller"
+        args:
+          - "-enable-leader-election"
+      serviceAccount: mcs-api-controller

@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-network-modifier
+  namespace: default
+spec:
+  hostNetwork: true
+  containers:
+    - name: host-network-modifier
+      securityContext:
+        privileged: true
+      resources:
+        limits:
+          cpu: 100m
+          memory: 100Mi
+      env:
+        - name: NODE_IP
+          valueFrom:
+            configMapKeyRef:
+              name: "node-config"
+              key: "node_ip"
+        - name: MAC
+          valueFrom:
+            configMapKeyRef:
+              name: "node-config"
+              key: "node_mac"
+        - name: SUBNET
+          valueFrom:
+            configMapKeyRef:
+              name: "node-config"
+              key: "node_subnet"
+        - name: CIDR1
+          valueFrom:
+            configMapKeyRef:
+              name: "node-config"
+              key: "cidr1"
+        - name: CIDR2
+          valueFrom:
+            configMapKeyRef:
+              name: "node-config"
+              key: "cidr2"
+      image: jonlabelle/network-tools
+      command: ["/bin/bash", "-c", "--"]
+      args: ["/create-routes.sh"]
+      volumeMounts:
+        - name: host-network-script
+          mountPath: /create-routes.sh
+          subPath: create-routes.sh
+  restartPolicy: Never
+  volumes:
+    - name: host-network-script
+      configMap:
+        name: host-network-script
+        defaultMode: 0777
